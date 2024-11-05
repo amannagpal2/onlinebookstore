@@ -1,0 +1,12 @@
+### **Variables inside lambda_configs**
+
+| **Variable**                        | **Type**    | **Description**                                                                                 |
+|-------------------------------------|-------------|-------------------------------------------------------------------------------------------------|
+|`s3_bucket`| `string`| Name of the s3 bucket storing code to be deployed in lambda functions|
+|`create_storage_bucket_kms_key`| `bool` | Controls the creation of KMS Key associated with the above s3 bucket. Required for certain lambdas. Set to ***`true`*** to create the key and ***`false`*** to not create the key|
+|`costprotection_trigger`| `string` | time interval after which the costprotection function will be triggered `(eg. rate(15 minutes))`      |
+|`costnotifier_trigger`|`string`| time interval after which the costnotifier function will be triggered `(eg. rate(15 minutes))` |
+|`eks_oidc_url`|`string`| link to your eks cluster    |
+|`efs_id_param_name`|`string`| specifically required for ts_stimuli lambda function and contains the name/path of the ssm parameter that is storing the efs_id for this function    |
+|`enable_node_uptime_tracker`|`bool`| can be enabled to deploy Tracker system for EC2 uptime     |
+|`ts_stimuli_layer_name`|`string`| specifically required for ts_stimuli lambda, is the name of the layer that stores the additional libraries needed for this function   |
