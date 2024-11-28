@@ -1,0 +1,63 @@
+#cloud-config  
+package_update: true  
+packages:  
+  - unzip
+  - tar
+  - wget
+
+write_files:
+  - path: /opt/go/bin/licenses.yml
+    content: |
+      ---
+      licenses:
+        - name: server1
+          license_file: /opt/flexnet/license/all.lic
+          monitor_users: True
+          monitor_reservations: True
+          monitor_versions: False
+
+  - path: /etc/systemd/system/flexlm_exporter.service
+    content: |
+      [Unit]
+      Description=Flexlm Exporter for prometheus
+      After=network.target
+
+
+      [Service]
+      Type=simple
+      User=root
+      Group=root
+      WorkingDirectory=/opt/go/bin
+      ExecStart=/opt/go/bin/flexlm_exporter --path.lmutil="/opt/go/bin/lmutil"
+      Restart=always
+      RestartSec=30
+
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:  
+  - sudo apt-get update
+  
+   # go_setup
+  - cd ~
+  - sudo wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
+  - sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+  - echo 'export PATH=$PATH:/usr/local/go/bin' >> bashrc
+  - source ~/.bashrc
+    
+   #install flexlm exporter
+  - cd ~
+  - go install github.com/mjtrangoni/flexlm_exporter@latest
+  - sudo mv -f go /opt
+   
+   #lmutil setup
+  - sudo cp /opt/flexnet/bin/lmutil /opt/go/bin
+  - echo 'export LM_LICENSE_FILE=/opt/flexnet/license/all.lic' >> ~/.bashrc
+  - echo 'export PATH=$PATH:/opt/go/bin' >> ~/.bashrc
+  - source ~/.bashrc
+
+  - sudo systemctl daemon-reload
+  - sudo systemctl start flexlm_exporter
+  - sudo systemctl enable flexlm_exporter
+  
